@@ -24,14 +24,14 @@ ChipWrapper::~ChipWrapper()
  */
 bool ChipWrapper::Initialize()
 {
-    ChipWrapper::CommissionDevice(0x7283);
+    
     return true;
 }
 
 /**
  * @brief Sends a command to the specified device.
  */
-bool ChipWrapper::CommissionDevice(const int deviceID)
+bool ChipWrapper::CommissionDevice(const int deviceID, int passCode, int discriminator)
 {
     std::cout << "starting initialization ...\n";
     char buffer[128];
@@ -40,7 +40,8 @@ bool ChipWrapper::CommissionDevice(const int deviceID)
     std::string ssid;
     std::string passphrase;
 
-    command = "~/chip-tool pairing ble-wifi " + std::to_string(deviceID) + " " + getSSID() + " " + getPassphrase() + " " + "20202021 3840";
+    command = "~/chip-tool pairing ble-wifi " + std::to_string(deviceID) + " " + 
+    getSSID() + " " + getPassphrase() + " " + std::to_string(passCode) + " " + std::to_string(discriminator);
 
     std::cout << "command is: " << command << std::endl;
 

@@ -9,7 +9,9 @@ int main()
 
     ChipWrapper chipTool;
 
-    if (chipTool.Initialize())
+    
+
+    if (chipTool.CommissionDevice(0x7283, 20202021, 3840))
     {
         std::cout << "chip-tool initialized succesfully\n";
     }
@@ -17,7 +19,6 @@ int main()
     {
         std::cerr << "failed to initialze chip-tool\n";
     }
-    // SendCommand(0x00, "test");
     return 0;
 }
 
