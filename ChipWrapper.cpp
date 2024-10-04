@@ -2,6 +2,10 @@
 #include "ChipWrapper.h"
 #include <iostream>
 #include <string>
+#include <boost/process.hpp>
+
+namespace bp  = boost::process;
+
 
 /**
  * @brief Constructor for the ChipWrapper class.
@@ -34,26 +38,33 @@ bool ChipWrapper::Initialize()
 bool ChipWrapper::CommissionDevice(const int deviceID, int passCode, int discriminator)
 {
     std::cout << "starting initialization ...\n";
-    char buffer[128];
-
-    std::string command;
-    std::string ssid;
-    std::string passphrase;
-
-    command = "~/chip-tool pairing ble-wifi " + std::to_string(deviceID) + " " + 
-    getSSID() + " " + getPassphrase() + " " + std::to_string(passCode) + " " + std::to_string(discriminator);
+    
+    std::string homeDir = std::getenv("HOME");
+    std::string command = homeDir +
+                          "/chip-tool pairing ble-wifi " + 
+                          std::to_string(deviceID) + " " + 
+                          getSSID() + " " + 
+                          getPassphrase() + " " + 
+                          std::to_string(passCode) + " " + 
+                          std::to_string(discriminator);
 
     std::cout << "command is: " << command << std::endl;
 
-    int result = system(command.c_str());
-    
-    if (result)
+    std::string output;
+
+    bp::ipstream pipe_stream;
+    bp::child c(command, bp::std_out > pipe_stream);
+
+    std::string line;
+
+    while (pipe_stream && std::getline(pipe_stream, line) && !line.empty())
     {
-        std::cout << "failed to commision device";
-        return false;
+        output += line + "\n";
     }
 
-    std::cout << "device successfully commisioned";
+    c.wait();
+    std::cout << "command output:\n" << output << std::endl;
+
     return true;
 }
 
@@ -116,13 +127,10 @@ std::string ChipWrapper::getPassphrase()
     {
         passphrase += buffer;
     }
-
-    std::cout << "pass: " << passphrase << std::endl;
    
     if (!passphrase.empty() && passphrase.back() == '\n') 
     {
         passphrase.erase(passphrase.size() - 1); // Remove the last character
-
     }
     
     return passphrase;

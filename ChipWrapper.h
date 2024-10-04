@@ -25,8 +25,8 @@ public:
     /**
      * @brief Sends a command to the specified device.
      * @param deviceID The ID of the device to send the command to.
-     * @param passCode
-     * @param discriminator
+     * @param passCode of the target device
+     * @param discriminator of the target device
      * @return True if the command was sent successfully, false otherwise.
      */
     bool CommissionDevice(const int deviceID, int passCode, int discriminator);
